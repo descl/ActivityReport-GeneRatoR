@@ -1,0 +1,16 @@
+TEST = ""
+
+DRIVE_APP_NAME = ARGRR-extractor
+DRIVE_FOLDER_ID = The drive folder id (look at the url in gdrive, don't add "")
+DRIVE_FOLDER_GENERATED_ID = The drive folder in which add the generated files
+
+RAWEB_EXTRACTED_FILE = config/team-2012.xml #if you want to extract datas from an Inria team
+
+MYSQL_LOGIN = login
+MYSQL_PASS = password
+MYSQL_URL = jdbc:mysql://server:3306/database
+
+
+POLE = ARGRR
+START_PERIOD = 01/01/2010
+END_PERIOD = 30/06/2014

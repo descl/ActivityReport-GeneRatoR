@@ -1,0 +1,8 @@
+In order to run the project:
+mvn -DskipTests install
+
+
+mvn exec:java -pl ARGRR-gDrive-downloader  #in order to download the gdrive files
+mvn exec:java -pl ARGRR-latex-writer
+mvn exec:java -pl ARGRR-gDrive-uploader
+

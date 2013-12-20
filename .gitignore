@@ -1,0 +1,13 @@
+/ARGRR-INRIA-raweb-extractor/target/
+/ARGRR-MySQL-extractor/target/
+/ARGRR-excel-extractor/target/
+/ARGRR-gDrive-downloader/target/
+/ARGRR-gDrive-uploader/target/
+/ARGRR-latex-writer/target/
+/ARGRR-utils/target/
+/target/
+/config/client_secret.json
+/config/argrr.properties
+/log/
+*.log
+*/*.log
