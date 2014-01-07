@@ -1,8 +1,7 @@
 #ActivityReport-GeneRatoR
 
 #### An activity report generator
-infos about how the app
-
+Tool wich help research teams to extract datas from SI to LaTeX files in order to generate Activity reports.
 
 
 ## How to use the tool
@@ -29,7 +28,9 @@ infos about how the app
 3.  mvn exec:java -pl ARGRR-latex-writer
 4.  mvn exec:java -pl ARGRR-gDrive-uploader
 
-##Licence
 
 ##Authors
 [Christophe Desclaux](http://www.desclaux.me) (I3S, CNRS), creation of the tool)
+
+##License
+[MIT License](http://en.wikipedia.org/wiki/MIT_License) (c) Christophe Desclaux
