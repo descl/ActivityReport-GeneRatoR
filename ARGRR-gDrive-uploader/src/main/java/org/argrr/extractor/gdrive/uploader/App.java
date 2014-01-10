@@ -49,29 +49,44 @@ public class App {
     
     public static void main( String[] args ) throws IOException{
         String rootOutputPath = App.class.getClassLoader().getResource("./").getPath()+"../../../report/generated";
+        String rootTemplatesPath = App.class.getClassLoader().getResource("./").getPath()+"../../../templates";
         Drive drive =  DriveApi.getConnection();
         //remove the previous generated files
         Logger.getLogger(App.class.getName()).log(Level.INFO, "remove old uploaded files ");
             
-        ChildList children = drive.children().list(Config.getVar("DRIVE_FOLDER_GENERATED_ID")).execute();
-            for (ChildReference child : children.getItems()) {
-              drive.children().delete(Config.getVar("DRIVE_FOLDER_GENERATED_ID"), child.getId()).execute();
-        }
+        emptyFolder(drive,Config.getVar("DRIVE_FOLDER_GENERATED_ID"));
+        emptyFolder(drive,Config.getVar("DRIVE_FOLDER_TEMPLATES_ID"));
             
+        //add the generated files 
+        System.out.println(rootOutputPath);
+        
         for(java.io.File  f: FileUtils.listFiles(new java.io.File (rootOutputPath), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE)){
             Logger.getLogger(App.class.getName()).log(Level.INFO, "add to gdrive file "+f.getName());
-            uploadFile(f,drive);
+            uploadFile(f,drive,Config.getVar("DRIVE_FOLDER_GENERATED_ID"));
         }
-        uploadFile(FileUtils.getFile(rootOutputPath+"/../report.pdf"),drive);
-        uploadFile(FileUtils.getFile(rootOutputPath+"/../report.tex"),drive);
+        
+        //add the templates files
+        for(java.io.File  f: FileUtils.listFiles(new java.io.File (rootTemplatesPath), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE)){
+            Logger.getLogger(App.class.getName()).log(Level.INFO, "add to gdrive file "+f.getName());
+            uploadFile(f,drive,Config.getVar("DRIVE_FOLDER_TEMPLATES_ID"));
+        }
+        
+        uploadFile(FileUtils.getFile(rootOutputPath+"/../report.pdf"),drive,Config.getVar("DRIVE_FOLDER_GENERATED_ID"));
+        uploadFile(FileUtils.getFile(rootOutputPath+"/../report.tex"),drive,Config.getVar("DRIVE_FOLDER_GENERATED_ID"));
     }
     
-  public static void uploadFile(java.io.File file,Drive drive) throws IOException{
+    public static void emptyFolder(Drive drive, String folder) throws IOException{
+        ChildList children = drive.children().list(folder).execute();
+            for (ChildReference child : children.getItems()) {
+              drive.children().delete(folder, child.getId()).execute();
+        }
+    }
+  public static void uploadFile(java.io.File file,Drive drive, String folder) throws IOException{
     
 
     com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
     fileMetadata.setTitle(file.getName());
-    fileMetadata.setParents(Arrays.asList(new ParentReference().setId(Config.getVar("DRIVE_FOLDER_GENERATED_ID"))));
+    fileMetadata.setParents(Arrays.asList(new ParentReference().setId(folder)));
 
     FileContent mediaContent;
     if(file.getName().endsWith("pdf")){

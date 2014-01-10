@@ -42,11 +42,14 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  * @author cdesclaux <christophe@desclaux.me>
  */
 public class SpreadSheetFile {
+    
+    private static final String rootPath = SpreadSheetFile.class.getClassLoader().getResource("./").getPath()+"../../../";
+    private static final String DRIVE_FOLDER = "target/driveDocs";
     public XSSFWorkbook workbook;
     public HashMap<String,SpreadSheetTab> tabs;
 
     public SpreadSheetFile(String f) {
-        this(new File(f));
+        this(new File(rootPath+DRIVE_FOLDER+"/"+f));
     }
     public SpreadSheetFile(File f) {
         FileInputStream file = null;
@@ -77,7 +80,10 @@ public class SpreadSheetFile {
         return tabs.get(name);
     }
     
-
+    public static SpreadSheetFile getFile(String file){
+        return new SpreadSheetFile(file);
+    }
+    
     @Override
     public String toString() {
         String str =  "SpreadSheetFile{" + "workbook with =" + tabs.size() + "\ntabs:\n";

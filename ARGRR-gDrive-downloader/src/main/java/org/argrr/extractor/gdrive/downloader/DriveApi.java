@@ -33,6 +33,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -46,6 +48,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLConnection;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,11 +88,8 @@ public class DriveApi {
 
     /** Authorizes the installed application to access user's protected data. */
     public static Credential authorize() throws Exception {
-        // load client secrets
-        InputStream fis = Config.getDriveApi();
-
-
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,new InputStreamReader(fis));
+        
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,new InputStreamReader(Config.getDriveApi()));
         if (clientSecrets.getDetails().getClientId().startsWith("Enter") || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
             System.out.println(
                 "Enter Client ID and Secret from https://code.google.com/apis/console/?api=drive "
@@ -100,8 +100,10 @@ public class DriveApi {
         // set up authorization code flow
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
             httpTransport, JSON_FACTORY, clientSecrets,
-            Collections.singleton(DriveScopes.DRIVE)).setDataStoreFactory(dataStoreFactory)
-            .build();
+            Collections.singleton(DriveScopes.DRIVE))
+                .setDataStoreFactory(dataStoreFactory)
+                .setTransport(httpTransport)
+                .build();
         // authorize
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
     }
@@ -116,9 +118,19 @@ public class DriveApi {
             httpTransport = GoogleNetHttpTransport.newTrustedTransport();
             dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
             // authorization
-            Credential credential = authorize();
+            final Credential credential = authorize();
             // set up the global Drive instance
-            drive = new Drive.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName(Config.getVar("DRIVE_APP_NAME")).build();
+            drive = new Drive.Builder(httpTransport, JSON_FACTORY, credential)
+                    .setApplicationName(Config.getVar("DRIVE_APP_NAME"))
+                    .setHttpRequestInitializer(new HttpRequestInitializer() {
+                        @Override
+                        public void initialize(HttpRequest httpRequest) throws IOException {
+                          credential.initialize(httpRequest);
+                          httpRequest.setConnectTimeout(3 * 60000);  // 3 minutes connect timeout
+                          httpRequest.setReadTimeout(3 * 60000);  // 3 minutes read timeout
+                        }
+                      })
+                    .build();
         } catch (GeneralSecurityException ex) {
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

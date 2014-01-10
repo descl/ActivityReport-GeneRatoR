@@ -44,9 +44,6 @@ import org.argrr.extractor.utils.Config;
  */
 public class App 
 {
-    private static final String DRIVE_FOLDER = "target/driveDocs";
-    private static final String GLC_RA_ID = "RA de GLC.xlsx";
-    private static final String GLC_SOFTWARES_ID = "I3S-GLC softwares (distributed or not).xlsx";
     public static void main( String[] args ) throws IOException
     {
         String rootPath = App.class.getClassLoader().getResource("./").getPath()+"../../../";
@@ -55,8 +52,7 @@ public class App
         
         VelocityContext context = new VelocityContext();
         
-        context.put( "GLC_RA", new SpreadSheetFile(rootPath+DRIVE_FOLDER+"/"+GLC_RA_ID));
-        context.put( "GLC_SOFTWARES", new SpreadSheetFile(rootPath+DRIVE_FOLDER+"/"+GLC_SOFTWARES_ID));
+        context.put( "SpreadSheetFile", SpreadSheetFile.class);
         context.put( "INRIA_RAWEB_EXPORT", new InriaRaweb(rootPath+Config.getVar("RAWEB_EXTRACTED_FILE")));
         context.put( "TDB_BDD", new MySQLUtils());
         context.put( "DATE", new DateTool());
